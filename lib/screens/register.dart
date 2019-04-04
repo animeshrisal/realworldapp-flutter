@@ -3,6 +3,7 @@ import 'package:realworldapp/blocs/register_bloc.dart';
 import 'package:realworldapp/blocs/register_event.dart';
 import 'package:realworldapp/blocs/register_form_bloc.dart';
 import 'package:realworldapp/blocs/register_state.dart';
+import 'package:realworldapp/widgets/pending_action.dart';
 import 'package:flutter/material.dart';
 
 class RegisterForm extends StatefulWidget {
@@ -43,7 +44,7 @@ class _RegisterFormState extends State<RegisterForm> {
         bloc: _registerBloc,
         builder: (BuildContext context, RegisterState state) {
           if (state.isBusy) {
-            return _buildFailure();
+            return PendingAction();
           } else if (state.isSuccess) {
             return _buildSuccess();
           } else if (state.isFailure) {

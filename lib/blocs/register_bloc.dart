@@ -13,7 +13,7 @@ class RegisterBloc extends BlocEventStateBase<RegisterEvent, RegisterState> {
       RegisterEvent event, RegisterState currentState) async* {
     if (event.event == RegisterEventType.working) {
       yield RegisterState.busy();
-      print('Register of ${event.email}/${event.password}');
+      print('Register of ${event.email}/${event.password}/${event.username}');
 
       await Future.delayed(const Duration(seconds: 1));
 
