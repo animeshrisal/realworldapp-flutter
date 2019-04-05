@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:realworldapp/screens/register.dart';
+import 'package:realworldapp/screens/users.dart';
+import 'package:realworldapp/blocs/user_bloc.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("AAAAAAA"),
+    return BlocProvider<UserBloc>(
+      bloc: UserBloc(),
+      child: MaterialApp(
+        title: 'BLoC Samples',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
         ),
-        body: RegisterForm());
+        home: Users(),
+      ),
+    );
   }
 }

@@ -1,35 +1,15 @@
 import 'package:realworldapp/bloc_helpers/bloc_event_state.dart';
 
-class RegisterState extends BlocState {
-  RegisterState({
-    this.isBusy: false,
-    this.isSuccess: false,
-    this.isFailure: false,
-  });
+class RegisterEvent extends BlocEvent {
+  RegisterEvent({this.event, this.email, this.password, this.username});
 
-  final bool isBusy;
-  final bool isSuccess;
-  final bool isFailure;
+  final RegisterEventType event;
+  final String email;
+  final String password;
+  final String username;
+}
 
-  factory RegisterState.noAction() {
-    return RegisterState();
-  }
-
-  factory RegisterState.busy() {
-    return RegisterState(
-      isBusy: true,
-    );
-  }
-
-  factory RegisterState.success() {
-    return RegisterState(
-      isSuccess: true,
-    );
-  }
-
-  factory RegisterState.failure() {
-    return RegisterState(
-      isFailure: true,
-    );
-  }
+enum RegisterEventType {
+  none,
+  working,
 }
