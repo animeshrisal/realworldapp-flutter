@@ -7,7 +7,6 @@ import 'package:dio/dio.dart';
 class RegisterBloc extends BlocEventStateBase<RegisterEvent, RegisterState> {
   final String _endPoint = "http://192.168.31.55:4000/users";
   final Dio _dio = Dio();
-  final Auth auth = Auth();
 
   RegisterBloc()
       : super(
