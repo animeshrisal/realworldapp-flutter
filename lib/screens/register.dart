@@ -1,8 +1,8 @@
 import 'package:realworldapp/bloc_widgets/bloc_state_builder.dart';
-import 'package:realworldapp/blocs/register_bloc.dart';
-import 'package:realworldapp/blocs/register_event.dart';
-import 'package:realworldapp/blocs/register_form_bloc.dart';
-import 'package:realworldapp/blocs/register_state.dart';
+import 'package:realworldapp/blocs/registration/register_bloc.dart';
+import 'package:realworldapp/blocs/registration/register_event.dart';
+import 'package:realworldapp/blocs/registration/register_form_bloc.dart';
+import 'package:realworldapp/blocs/registration/register_state.dart';
 import 'package:realworldapp/widgets/pending_action.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   TextEditingController _emailController;
   TextEditingController _passwordController;
-  TextEditingController _retypeController;
+  TextEditingController _usernameController;
   RegisterFormBloc _registerFormBloc;
   RegisterBloc _registerBloc;
 
@@ -23,7 +23,7 @@ class _RegisterFormState extends State<RegisterForm> {
     super.initState();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
-    _retypeController = TextEditingController();
+    _usernameController = TextEditingController();
     _registerFormBloc = RegisterFormBloc();
     _registerBloc = RegisterBloc();
   }
@@ -34,7 +34,7 @@ class _RegisterFormState extends State<RegisterForm> {
     _registerFormBloc?.dispose();
     _emailController?.dispose();
     _passwordController?.dispose();
-    _retypeController?.dispose();
+    _usernameController?.dispose();
     super.dispose();
   }
 
@@ -104,7 +104,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     labelText: 'Username',
                     errorText: snapshot.error,
                   ),
-                  controller: _retypeController,
+                  controller: _usernameController,
                   obscureText: false,
                   onChanged: _registerFormBloc.changeUsername,
                 );
@@ -116,10 +116,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: Text('Register'),
                   onPressed: (snapshot.hasData && snapshot.data == true)
                       ? () {
+                          print("AAAA");
                           _registerBloc.emitEvent(RegisterEvent(
                               event: RegisterEventType.working,
                               email: _emailController.text,
-                              password: _passwordController.text));
+                              password: _passwordController.text,
+                              username: _usernameController.text));
                         }
                       : null,
                 );

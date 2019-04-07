@@ -21,12 +21,12 @@ class UserBloc extends BlocBase {
     _userListController.close();
   }
 
-  Future<Null> getUser() async {
+  Future<UserList> getUser() async {
     try {
       Response response = await _dio.get(_endPoint);
       _userListController.sink.add(UserList.fromJson(response.data));
     } catch (error) {
-      return null;
+      return UserList();
     }
   }
 }

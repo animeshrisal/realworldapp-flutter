@@ -25,9 +25,6 @@ class RegisterFormBloc extends Object with Validators implements BlocBase {
     final validEmail = _emailController.value;
     final validPassword = _passwordController.value;
     final validUsername = _usernameController.value;
-
-    print(
-        'Email is $validEmail, and password is $validPassword, and the username is $validUsername');
   }
 
   dispose() {
