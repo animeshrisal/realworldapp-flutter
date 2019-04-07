@@ -46,18 +46,15 @@ class _RegisterFormState extends State<RegisterForm> {
           if (state.isBusy) {
             return PendingAction();
           } else if (state.isSuccess) {
-            return _buildSuccess();
+            //
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.of(context).pushReplacementNamed('/home');
+            });
           } else if (state.isFailure) {
             return _buildFailure();
           }
           return _buildForm();
         });
-  }
-
-  Widget _buildSuccess() {
-    return Center(
-      child: Text('Success'),
-    );
   }
 
   Widget _buildFailure() {
