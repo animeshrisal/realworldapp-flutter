@@ -40,21 +40,22 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocEventStateBuilder<RegisterState>(
-        bloc: _registerBloc,
-        builder: (BuildContext context, RegisterState state) {
-          if (state.isBusy) {
-            return PendingAction();
-          } else if (state.isSuccess) {
-            //
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushReplacementNamed('/home');
-            });
-          } else if (state.isFailure) {
-            return _buildFailure();
-          }
-          return _buildForm();
-        });
+    return Scaffold(
+        appBar: AppBar(title: Text("AAAA")),
+        body: BlocEventStateBuilder<RegisterState>(
+            bloc: _registerBloc,
+            builder: (BuildContext context, RegisterState state) {
+              if (state.isBusy) {
+                return PendingAction();
+              } else if (state.isSuccess) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pop(true);
+                });
+              } else if (state.isFailure) {
+                return _buildFailure();
+              }
+              return _buildForm();
+            }));
   }
 
   Widget _buildFailure() {

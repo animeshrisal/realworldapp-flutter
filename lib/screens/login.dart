@@ -37,21 +37,23 @@ class _LoginFormState extends State<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocEventStateBuilder<LoginState>(
-        bloc: _loginBloc,
-        builder: (BuildContext context, LoginState state) {
-          if (state.isBusy) {
-            return PendingAction();
-          } else if (state.isSuccess) {
-            //
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.of(context).pushReplacementNamed('/home');
-            });
-          } else if (state.isFailure) {
-            return _buildFailure();
-          }
-          return _buildForm();
-        });
+    return Scaffold(
+        appBar: AppBar(title: Text("Login")),
+        body: BlocEventStateBuilder<LoginState>(
+            bloc: _loginBloc,
+            builder: (BuildContext context, LoginState state) {
+              if (state.isBusy) {
+                return PendingAction();
+              } else if (state.isSuccess) {
+                //
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.of(context).pushReplacementNamed('/home');
+                });
+              } else if (state.isFailure) {
+                return _buildFailure();
+              }
+              return _buildForm();
+            }));
   }
 
   Widget _buildFailure() {
