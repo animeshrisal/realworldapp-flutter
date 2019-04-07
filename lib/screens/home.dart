@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:realworldapp/screens/register.dart';
 import 'package:realworldapp/screens/login.dart';
+import 'package:realworldapp/screens/add_article.dart';
+import 'package:realworldapp/screens/articles.dart';
+import 'package:realworldapp/screens/users_page.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,7 +12,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
-  final List<Widget> _children = [];
+  final List<Widget> _children = [Articles(), AddArticle(), UsersPage()];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +27,7 @@ class _HomePageState extends State<HomePage> {
           child: ListView(
             children: <Widget>[
               DrawerHeader(
-                child: Text("AAAA"),
+                child: Text("Blog"),
               ),
               ListTile(
                 title: Text('Register'),
@@ -38,14 +47,15 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         appBar: AppBar(
-          title: Text("AAAAA"),
+          title: Text("Home"),
         ),
         body: _children[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
-            currentIndex: 0,
+            currentIndex: _currentIndex,
+            onTap: _onItemTapped,
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
-                  icon: Icon(Icons.home), title: Text("Home")),
+                  icon: Icon(Icons.home), title: Text("Articles")),
               BottomNavigationBarItem(
                   icon: Icon(Icons.edit), title: Text("New Post")),
               BottomNavigationBarItem(

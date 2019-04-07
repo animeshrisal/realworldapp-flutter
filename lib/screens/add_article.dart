@@ -7,6 +7,6 @@ class AddArticle extends StatefulWidget {
 class _AddArticleState extends State<AddArticle> {
   @override
   Widget build(BuildContext context) {
-    return Text("AAAA");
+    return Text("Add Articles");
   }
 }
