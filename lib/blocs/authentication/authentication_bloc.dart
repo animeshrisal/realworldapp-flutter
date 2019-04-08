@@ -28,10 +28,10 @@ class AuthenticationBloc
       final authBean = AuthBean(adapter);
       try {
         Auth auth = await authBean.find('0');
-        print(auth.jwt);
-        yield AuthenticationState.authenticated(auth.jwt);
         print("Found jwt");
+        yield AuthenticationState.authenticated(auth.jwt);
       } catch (e) {
+        print("Didnt find jwt");
         yield AuthenticationState.failure();
         print(e);
       }
@@ -68,6 +68,34 @@ class AuthenticationBloc
         print('yeet');
       }
     }
-    if (event.event == AuthenticationEventType.authentication) {}
+    if (event.event == AuthenticationEventType.authentication) {
+      Response response = await _dio.post("$_endPoint/login", data: {
+        "user": {"email": event.email, "password": event.password},
+      });
+
+      if (response.statusCode == 201) {
+        print(response.data['user']['token']);
+        String dbPath = await getDatabasesPath();
+        _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
+        await _adapter.connect();
+        final authBean = AuthBean(_adapter);
+        try {
+          Auth auth = new Auth(id: '0', jwt: response.data['user']['token']);
+
+          await authBean.upsert(auth);
+          yield AuthenticationState.authenticated(
+              response.data['user']['token']);
+          print("Saved");
+        } catch (e) {
+          yield AuthenticationState.failure();
+          print(e);
+        }
+        _adapter.close();
+      } else {
+        print('yeet');
+      }
+
+      print(response.data['user']['token']);
+    }
   }
 }

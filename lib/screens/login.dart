@@ -1,10 +1,14 @@
 import 'package:realworldapp/bloc_widgets/bloc_state_builder.dart';
 import 'package:realworldapp/blocs/login/login_bloc.dart';
 import 'package:realworldapp/blocs/login/login_event.dart';
-import 'package:realworldapp/blocs/login/login_form_bloc.dart';
+import 'package:realworldapp/blocs/authentication/login_form_bloc.dart';
 import 'package:realworldapp/blocs/login/login_state.dart';
 import 'package:realworldapp/widgets/pending_action.dart';
 import 'package:flutter/material.dart';
+import 'package:realworldapp/blocs/authentication/authentication_state.dart';
+import 'package:realworldapp/blocs/authentication/authentication_event.dart';
+import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 
 class LoginForm extends StatefulWidget {
   @override
@@ -15,7 +19,8 @@ class _LoginFormState extends State<LoginForm> {
   TextEditingController _emailController;
   TextEditingController _passwordController;
   LoginFormBloc _loginFormBloc;
-  LoginBloc _loginBloc;
+
+  AuthenticationBloc _authenticationBloc;
 
   @override
   void initState() {
@@ -23,12 +28,11 @@ class _LoginFormState extends State<LoginForm> {
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
     _loginFormBloc = LoginFormBloc();
-    _loginBloc = LoginBloc();
+    _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
   }
 
   @override
   void dispose() {
-    _loginBloc?.dispose();
     _loginFormBloc?.dispose();
     _emailController?.dispose();
     _passwordController?.dispose();
@@ -39,17 +43,15 @@ class _LoginFormState extends State<LoginForm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("Login")),
-        body: BlocEventStateBuilder<LoginState>(
-            bloc: _loginBloc,
-            builder: (BuildContext context, LoginState state) {
-              if (state.isBusy) {
+        body: BlocEventStateBuilder<AuthenticationState>(
+            bloc: _authenticationBloc,
+            builder: (BuildContext context, AuthenticationState state) {
+              if (state.isAuthenticating) {
                 return PendingAction();
-              } else if (state.isSuccess) {
-                //
+              } else if (state.isAuthenticated) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.of(context).pushReplacementNamed('/home');
+                  Navigator.of(context).pop(true);
                 });
-              } else if (state.isFailure) {
                 return _buildFailure();
               }
               return _buildForm();
@@ -100,8 +102,8 @@ class _LoginFormState extends State<LoginForm> {
                   onPressed: (snapshot.hasData && snapshot.data == true)
                       ? () {
                           print("AAAA");
-                          _loginBloc.emitEvent(LoginEvent(
-                              event: LoginEventType.working,
+                          _authenticationBloc.emitEvent(AuthenticationEvent(
+                              event: AuthenticationEventType.authentication,
                               email: _emailController.text,
                               password: _passwordController.text));
                         }

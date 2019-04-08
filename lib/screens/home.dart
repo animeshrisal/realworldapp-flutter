@@ -7,6 +7,8 @@ import 'package:realworldapp/screens/users_page.dart';
 import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 import 'package:realworldapp/blocs/authentication/authentication_event.dart';
+import 'package:realworldapp/bloc_widgets/bloc_state_builder.dart';
+import 'package:realworldapp/blocs/authentication/authentication_state.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -32,32 +34,59 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  Widget drawer() {
+    return ListView(children: <Widget>[
+      DrawerHeader(
+        child: Text("Blog"),
+      ),
+      ListTile(
+        title: Text('Register'),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => RegisterForm()));
+        },
+      ),
+      ListTile(
+        title: Text('Login'),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => LoginForm()));
+        },
+      )
+    ]);
+  }
+
+  Widget userDrawer() {
+    return ListView(children: <Widget>[
+      DrawerHeader(
+        child: Text("Profile"),
+      ),
+      ListTile(
+        title: Text('Register'),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (BuildContext context) => RegisterForm()));
+        },
+      ),
+      ListTile(
+        title: Text('Logout'),
+      )
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         drawer: Drawer(
-          child: ListView(
-            children: <Widget>[
-              DrawerHeader(
-                child: Text("Blog"),
-              ),
-              ListTile(
-                title: Text('Register'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => RegisterForm()));
-                },
-              ),
-              ListTile(
-                title: Text('Login'),
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (BuildContext context) => LoginForm()));
-                },
-              )
-            ],
-          ),
-        ),
+            child: BlocEventStateBuilder<AuthenticationState>(
+                bloc: authenticationBloc,
+                builder: (BuildContext context, AuthenticationState state) {
+                  if (state.isAuthenticated) {
+                    return userDrawer();
+                  } else {
+                    return drawer();
+                  }
+                })),
         appBar: AppBar(
           title: Text("Home"),
         ),
