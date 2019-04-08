@@ -8,7 +8,7 @@ class Auth {
 
   String jwt;
 
-  Auth({this.jwt});
+  Auth({this.id, this.jwt});
 }
 
 @GenBean()
