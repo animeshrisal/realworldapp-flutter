@@ -15,5 +15,6 @@ enum AuthenticationEventType {
   none,
   registration,
   authentication,
-  checkLocalStorage
+  checkLocalStorage,
+  logout
 }

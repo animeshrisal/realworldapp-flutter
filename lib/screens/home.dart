@@ -69,8 +69,11 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       ListTile(
-        title: Text('Logout'),
-      )
+          title: Text('Logout'),
+          onTap: () {
+            authenticationBloc.emitEvent(
+                AuthenticationEvent(event: AuthenticationEventType.logout));
+          })
     ]);
   }
 

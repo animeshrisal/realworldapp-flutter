@@ -97,5 +97,9 @@ class AuthenticationBloc
 
       print(response.data['user']['token']);
     }
+
+    if (event.event == AuthenticationEventType.logout) {
+      yield AuthenticationState.logout();
+    }
   }
 }

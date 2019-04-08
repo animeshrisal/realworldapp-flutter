@@ -53,4 +53,8 @@ class AuthenticationState extends BlocState {
     return AuthenticationState(
         isAuthenticated: false, isCheckingLocalStorage: true);
   }
+
+  factory AuthenticationState.logout() {
+    return AuthenticationState(isAuthenticated: false, jwt: '');
+  }
 }
