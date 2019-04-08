@@ -3,6 +3,9 @@ import 'package:jaguar_orm/jaguar_orm.dart';
 part 'auth.jorm.dart';
 
 class Auth {
+  @PrimaryKey()
+  String id;
+
   String jwt;
 
   Auth({this.jwt});
