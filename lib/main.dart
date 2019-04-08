@@ -6,6 +6,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as path;
 import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
 import 'package:realworldapp/models/auth.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
+import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 
 SqfliteAdapter _adapter;
 
@@ -29,16 +31,18 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'BLoC Samples',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: HomePage(),
-        initialRoute: '/',
-        routes: {
-          '/register': (context) => RegisterForm(),
-          '/login': (context) => LoginForm(),
-        });
+    return BlocProvider<AuthenticationBloc>(
+        bloc: AuthenticationBloc(),
+        child: MaterialApp(
+            title: 'BLoC Samples',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            home: HomePage(),
+            initialRoute: '/',
+            routes: {
+              '/register': (context) => RegisterForm(),
+              '/login': (context) => LoginForm(),
+            }));
   }
 }

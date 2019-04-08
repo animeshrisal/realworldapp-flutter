@@ -1,19 +1,19 @@
 import 'package:realworldapp/bloc_helpers/bloc_event_state.dart';
 
-abstract class AuthenticationEvent extends BlocEvent {
+class AuthenticationEvent extends BlocEvent {
+  AuthenticationEvent(
+      {this.event, this.jwt, this.email, this.password, this.username});
+
+  final AuthenticationEventType event;
   final String jwt;
-
-  AuthenticationEvent({
-    this.jwt: '',
-  });
+  final String email;
+  final String password;
+  final String username;
 }
 
-class AuthenticationEventLogin extends AuthenticationEvent {
-  AuthenticationEventLogin({
-    String jwt,
-  }) : super(
-          jwt: jwt,
-        );
+enum AuthenticationEventType {
+  none,
+  registration,
+  authentication,
+  checkLocalStorage
 }
-
-class AuthenticationEventLogout extends AuthenticationEvent {}
