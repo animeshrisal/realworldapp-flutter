@@ -9,9 +9,8 @@ import 'package:realworldapp/models/auth.dart';
 import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 
-SqfliteAdapter _adapter;
-
 void main() async {
+  SqfliteAdapter _adapter;
   String dbPath = await getDatabasesPath();
   _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
 
@@ -20,19 +19,19 @@ void main() async {
     final authBean = AuthBean(_adapter);
 
     await authBean.createTable(ifNotExists: true);
-
-    _adapter.close();
   } catch (e) {
     print(e);
   }
-  return runApp(MyApp());
+  return runApp(MyApp(adapter: _adapter));
 }
 
 class MyApp extends StatelessWidget {
+  final SqfliteAdapter adapter;
   @override
+  MyApp({this.adapter});
   Widget build(BuildContext context) {
     return BlocProvider<AuthenticationBloc>(
-        bloc: AuthenticationBloc(),
+        bloc: AuthenticationBloc(adapter: adapter),
         child: MaterialApp(
             title: 'BLoC Samples',
             theme: ThemeData(

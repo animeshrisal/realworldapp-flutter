@@ -13,8 +13,8 @@ class AuthenticationBloc
     extends BlocEventStateBase<AuthenticationEvent, AuthenticationState> {
   final String _endPoint = "http://192.168.31.55:4000/users";
   final Dio _dio = Dio();
-
-  AuthenticationBloc()
+  final SqfliteAdapter adapter;
+  AuthenticationBloc({this.adapter})
       : super(
           initialState: AuthenticationState.checkLocalStorage(),
         );
@@ -25,19 +25,16 @@ class AuthenticationBloc
     print(currentState.isCheckingLocalStorage);
     if (currentState.isCheckingLocalStorage) {
       print('checkingLocalStorage');
-      String dbPath = await getDatabasesPath();
-      _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
-      await _adapter.connect();
-      final authBean = AuthBean(_adapter);
+      final authBean = AuthBean(adapter);
       try {
         Auth auth = await authBean.find('0');
+        print(auth.jwt);
         yield AuthenticationState.authenticated(auth.jwt);
         print("Found jwt");
       } catch (e) {
         yield AuthenticationState.failure();
-        print("Didnt find");
+        print(e);
       }
-      _adapter.close();
     }
 
     if (event.event == AuthenticationEventType.registration) {
@@ -50,7 +47,23 @@ class AuthenticationBloc
       });
 
       if (response.statusCode == 201) {
-        print(response);
+        print(response.data['user']['token']);
+        String dbPath = await getDatabasesPath();
+        _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
+        await _adapter.connect();
+        final authBean = AuthBean(_adapter);
+        try {
+          Auth auth = new Auth(id: '0', jwt: response.data['user']['token']);
+
+          await authBean.upsert(auth);
+          yield AuthenticationState.authenticated(
+              response.data['user']['token']);
+          print("Saved");
+        } catch (e) {
+          yield AuthenticationState.failure();
+          print(e);
+        }
+        _adapter.close();
       } else {
         print('yeet');
       }
