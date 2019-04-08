@@ -4,6 +4,9 @@ import 'package:realworldapp/screens/login.dart';
 import 'package:realworldapp/screens/add_article.dart';
 import 'package:realworldapp/screens/articles.dart';
 import 'package:realworldapp/screens/users_page.dart';
+import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
+import 'package:realworldapp/blocs/authentication/authentication_event.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -11,6 +14,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  AuthenticationBloc authenticationBloc;
+
+  @override
+  void initState() {
+    super.initState();
+    authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
+    authenticationBloc.emitEvent(AuthenticationEvent());
+  }
+
   int _currentIndex = 0;
   final List<Widget> _children = [Articles(), AddArticle(), UsersPage()];
 
