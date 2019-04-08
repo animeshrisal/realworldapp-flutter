@@ -51,7 +51,6 @@ class _RegisterFormState extends State<RegisterForm> {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Navigator.of(context).pop(true);
                 });
-                return _buildFailure();
               }
               return _buildForm();
             }));
