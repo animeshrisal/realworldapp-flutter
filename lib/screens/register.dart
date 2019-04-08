@@ -1,10 +1,11 @@
 import 'package:realworldapp/bloc_widgets/bloc_state_builder.dart';
-import 'package:realworldapp/blocs/registration/register_bloc.dart';
-import 'package:realworldapp/blocs/registration/register_event.dart';
-import 'package:realworldapp/blocs/registration/register_form_bloc.dart';
-import 'package:realworldapp/blocs/registration/register_state.dart';
+import 'package:realworldapp/blocs/authentication/register_form_bloc.dart';
 import 'package:realworldapp/widgets/pending_action.dart';
+import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
+import 'package:realworldapp/blocs/authentication/authentication_state.dart';
+import 'package:realworldapp/blocs/authentication/authentication_event.dart';
 
 class RegisterForm extends StatefulWidget {
   @override
@@ -16,7 +17,7 @@ class _RegisterFormState extends State<RegisterForm> {
   TextEditingController _passwordController;
   TextEditingController _usernameController;
   RegisterFormBloc _registerFormBloc;
-  RegisterBloc _registerBloc;
+  AuthenticationBloc _authenticationBloc;
 
   @override
   void initState() {
@@ -25,12 +26,11 @@ class _RegisterFormState extends State<RegisterForm> {
     _passwordController = TextEditingController();
     _usernameController = TextEditingController();
     _registerFormBloc = RegisterFormBloc();
-    _registerBloc = RegisterBloc();
+    _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
   }
 
   @override
   void dispose() {
-    _registerBloc?.dispose();
     _registerFormBloc?.dispose();
     _emailController?.dispose();
     _passwordController?.dispose();
@@ -42,16 +42,15 @@ class _RegisterFormState extends State<RegisterForm> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(title: Text("AAAA")),
-        body: BlocEventStateBuilder<RegisterState>(
-            bloc: _registerBloc,
-            builder: (BuildContext context, RegisterState state) {
-              if (state.isBusy) {
+        body: BlocEventStateBuilder<AuthenticationState>(
+            bloc: _authenticationBloc,
+            builder: (BuildContext context, AuthenticationState state) {
+              if (state.isAuthenticating) {
                 return PendingAction();
-              } else if (state.isSuccess) {
+              } else if (state.isAuthenticated) {
                 WidgetsBinding.instance.addPostFrameCallback((_) {
                   Navigator.of(context).pop(true);
                 });
-              } else if (state.isFailure) {
                 return _buildFailure();
               }
               return _buildForm();
@@ -115,8 +114,8 @@ class _RegisterFormState extends State<RegisterForm> {
                   onPressed: (snapshot.hasData && snapshot.data == true)
                       ? () {
                           print("AAAA");
-                          _registerBloc.emitEvent(RegisterEvent(
-                              event: RegisterEventType.working,
+                          _authenticationBloc.emitEvent(AuthenticationEvent(
+                              event: AuthenticationEventType.registration,
                               email: _emailController.text,
                               password: _passwordController.text,
                               username: _usernameController.text));
