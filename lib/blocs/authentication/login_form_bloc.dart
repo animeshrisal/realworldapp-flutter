@@ -17,11 +17,6 @@ class LoginFormBloc extends Object with Validators implements BlocBase {
   Function(String) get changeEmail => _emailController.sink.add;
   Function(String) get changePassword => _passwordController.sink.add;
 
-  submit() {
-    final validEmail = _emailController.value;
-    final validPassword = _passwordController.value;
-  }
-
   dispose() {
     _emailController.close();
     _passwordController.close();

@@ -21,12 +21,6 @@ class RegisterFormBloc extends Object with Validators implements BlocBase {
   Function(String) get changePassword => _passwordController.sink.add;
   Function(String) get changeUsername => _usernameController.sink.add;
 
-  submit() {
-    final validEmail = _emailController.value;
-    final validPassword = _passwordController.value;
-    final validUsername = _usernameController.value;
-  }
-
   dispose() {
     _emailController.close();
     _passwordController.close();
