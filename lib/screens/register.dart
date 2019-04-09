@@ -113,7 +113,6 @@ class _RegisterFormState extends State<RegisterForm> {
                   child: Text('Register'),
                   onPressed: (snapshot.hasData && snapshot.data == true)
                       ? () {
-                          print("AAAA");
                           _authenticationBloc.emitEvent(AuthenticationEvent(
                               event: AuthenticationEventType.registration,
                               email: _emailController.text,
