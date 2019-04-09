@@ -10,7 +10,6 @@ Article _$ArticleFromJson(Map<String, dynamic> json) {
   return Article(
       title: json['title'] as String,
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      tagList: (json['tagList'] as List).map((e) => e as String).toList(),
       slug: json['slug'] as String,
       id: json['id'] as int,
       favoriteCount: json['favoriteCount'] as int,
@@ -22,11 +21,10 @@ Article _$ArticleFromJson(Map<String, dynamic> json) {
 }
 
 Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
+      'id': instance.id,
       'title': instance.title,
       'updatedAt': instance.updatedAt.toIso8601String(),
-      'tagList': instance.tagList,
       'slug': instance.slug,
-      'id': instance.id,
       'favoriteCount': instance.favoriteCount,
       'favorited': instance.favorited,
       'description': instance.description,
