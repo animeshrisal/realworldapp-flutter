@@ -28,10 +28,13 @@ dependencies:
   jaguar_query_sqflite: ^2.2.9
   jaguar_query:
   jaguar_orm:
+  json_annotation: ^2.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  json_serializable: ^2.1.1
 
   build_runner:
   jaguar_orm_gen:
