@@ -94,7 +94,7 @@ class _AddArticleState extends State<AddArticle> {
                       ? () {
                           _networkBloc.emitEvent(
                               NetworkEvent<PostArticleRequest>(
-                                  event: NetworkEventType.request,
+                                  event: NetworkEventType.requestPost,
                                   modelName: 'article',
                                   model: PostArticleRequest(
                                       title: _titleController.text,
