@@ -93,17 +93,28 @@ class _HomePageState extends State<HomePage> {
         appBar: AppBar(
           title: Text("Home"),
         ),
-        body: _children[_currentIndex],
-        bottomNavigationBar: BottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: _onItemTapped,
-            items: <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.home), title: Text("Articles")),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.edit), title: Text("New Post")),
-              BottomNavigationBarItem(
-                  icon: Icon(Icons.search), title: Text("Search"))
-            ]));
+        body: DefaultTabController(
+            length: 3,
+            child: new Scaffold(
+                body: TabBarView(
+                    children: [Articles(), AddArticle(), UsersPage()]),
+                bottomNavigationBar: new TabBar(
+                  tabs: [
+                    Tab(
+                      icon: new Icon(Icons.home),
+                    ),
+                    Tab(
+                      icon: new Icon(Icons.rss_feed),
+                    ),
+                    Tab(
+                      icon: new Icon(Icons.perm_identity),
+                    ),
+                  ],
+                  labelColor: Colors.yellow,
+                  unselectedLabelColor: Colors.blue,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  indicatorPadding: EdgeInsets.all(5.0),
+                  indicatorColor: Colors.red,
+                ))));
   }
 }
