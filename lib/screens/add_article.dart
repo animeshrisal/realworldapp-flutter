@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:realworldapp/blocs/article/article_form_bloc.dart';
 import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
-import 'package:realworldapp/blocs/network/network_bloc.dart';
-import 'package:realworldapp/blocs/network/network_event.dart';
 import 'package:realworldapp/models/post_article_request.dart';
 
 class AddArticle extends StatefulWidget {
@@ -17,7 +15,6 @@ class _AddArticleState extends State<AddArticle> {
   TextEditingController _descriptionController;
   AuthenticationBloc _authenticationBloc;
   ArticleFormBloc _articleFormBloc;
-  NetworkBloc<PostArticleRequest> _networkBloc;
 
   @override
   void initState() {
@@ -28,8 +25,6 @@ class _AddArticleState extends State<AddArticle> {
     _descriptionController = TextEditingController();
     _authenticationBloc = BlocProvider.of<AuthenticationBloc>(context);
     _articleFormBloc = ArticleFormBloc();
-    _networkBloc = NetworkBloc<PostArticleRequest>(
-        authenticationBloc: _authenticationBloc);
   }
 
   @override
@@ -89,21 +84,12 @@ class _AddArticleState extends State<AddArticle> {
               stream: _articleFormBloc.submitValid,
               builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
                 return RaisedButton(
-                  child: Text('Submit'),
-                  onPressed: (snapshot.hasData && snapshot.data == true)
-                      ? () {
-                          _networkBloc.emitEvent(
-                              NetworkEvent<PostArticleRequest>(
-                                  event: NetworkEventType.requestPost,
-                                  modelName: 'article',
-                                  model: PostArticleRequest(
-                                      title: _titleController.text,
-                                      body: _bodyController.text,
-                                      description:
-                                          _descriptionController.text)));
-                        }
-                      : null,
-                );
+                    child: Text('Submit'),
+                    onPressed: (snapshot.hasData && snapshot.data == true)
+                        ? () {
+                            _articleFormBloc.save();
+                          }
+                        : null);
               }),
         ],
       ),
