@@ -25,15 +25,6 @@ class _HomePageState extends State<HomePage> {
     authenticationBloc.emitEvent(AuthenticationEvent());
   }
 
-  int _currentIndex = 0;
-  final List<Widget> _children = [Articles(), AddArticle(), UsersPage()];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
   Widget drawer() {
     return ListView(children: <Widget>[
       DrawerHeader(
