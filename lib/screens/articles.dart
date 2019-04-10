@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:realworldapp/blocs/network/network_bloc.dart';
-import 'package:realworldapp/blocs/network/network_event.dart';
+import 'package:realworldapp/blocs/article/article_bloc.dart';
+import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
+import 'package:realworldapp/models/article_list.dart';
 
 class Articles extends StatefulWidget {
   @override
@@ -8,18 +9,25 @@ class Articles extends StatefulWidget {
 }
 
 class _ArticlesState extends State<Articles> {
-  NetworkBloc networkBloc;
+  ArticleBloc _articleBloc;
 
   @override
   void initState() {
     super.initState();
-    networkBloc = NetworkBloc();
-    networkBloc.emitEvent(
-        NetworkEvent(event: NetworkEventType.requestGet, url: '/articles'));
+    _articleBloc = BlocProvider.of<ArticleBloc>(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Text("Articles");
+    return StreamBuilder<ArticleList>(
+      stream: _articleBloc.items,
+      builder: (BuildContext context, AsyncSnapshot<ArticleList> snapshot) {
+        return snapshot.hasData ? data(snapshot.data) : Text("AAA");
+      },
+    );
+  }
+
+  Widget data(ArticleList data) {
+    return Text(data.articlesCount.toString());
   }
 }
