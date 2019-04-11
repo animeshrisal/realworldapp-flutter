@@ -8,7 +8,6 @@ class DbHelper {
   String dbPath;
 
   Future initialize() async {
-    print("REEEEEE");
     dbPath = await getDatabasesPath();
     adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
     try {
