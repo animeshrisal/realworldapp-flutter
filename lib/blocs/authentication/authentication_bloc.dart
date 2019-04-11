@@ -1,20 +1,15 @@
 import 'package:realworldapp/bloc_helpers/bloc_event_state.dart';
 import 'package:realworldapp/blocs/authentication/authentication_event.dart';
 import 'package:realworldapp/blocs/authentication/authentication_state.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' as path;
-import 'package:jaguar_query_sqflite/jaguar_query_sqflite.dart';
 import 'package:realworldapp/models/auth.dart';
 import 'package:dio/dio.dart';
-
-SqfliteAdapter _adapter;
+import 'package:realworldapp/global/adapter.dart';
 
 class AuthenticationBloc
     extends BlocEventStateBase<AuthenticationEvent, AuthenticationState> {
   final String _endPoint = "http://192.168.31.55:4000/users";
   final Dio _dio = Dio();
-  final SqfliteAdapter adapter;
-  AuthenticationBloc({this.adapter})
+  AuthenticationBloc()
       : super(
           initialState: AuthenticationState.checkLocalStorage(),
         );
@@ -25,7 +20,7 @@ class AuthenticationBloc
     print(currentState.isCheckingLocalStorage);
     if (currentState.isCheckingLocalStorage) {
       print('checkingLocalStorage');
-      final authBean = AuthBean(adapter);
+      final authBean = AuthBean(dbHelper.adapter);
       try {
         Auth auth = await authBean.find('0');
         print("Found jwt");
@@ -48,10 +43,8 @@ class AuthenticationBloc
 
       if (response.statusCode == 201) {
         print(response.data['user']['token']);
-        String dbPath = await getDatabasesPath();
-        _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
-        await _adapter.connect();
-        final authBean = AuthBean(_adapter);
+
+        final authBean = AuthBean(dbHelper.adapter);
         try {
           Auth auth = new Auth(id: '0', jwt: response.data['user']['token']);
 
@@ -63,7 +56,6 @@ class AuthenticationBloc
           yield AuthenticationState.failure();
           print(e);
         }
-        _adapter.close();
       } else {
         print('yeet');
       }
@@ -75,10 +67,8 @@ class AuthenticationBloc
 
       if (response.statusCode == 201) {
         print(response.data['user']['token']);
-        String dbPath = await getDatabasesPath();
-        _adapter = SqfliteAdapter(path.join(dbPath, "test.db"));
-        await _adapter.connect();
-        final authBean = AuthBean(_adapter);
+
+        final authBean = AuthBean(dbHelper.adapter);
         try {
           Auth auth = new Auth(id: '0', jwt: response.data['user']['token']);
 
@@ -90,7 +80,6 @@ class AuthenticationBloc
           yield AuthenticationState.failure();
           print(e);
         }
-        _adapter.close();
       } else {
         print('yeet');
       }
