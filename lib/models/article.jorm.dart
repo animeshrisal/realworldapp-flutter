@@ -7,6 +7,7 @@ part of 'article.dart';
 // **************************************************************************
 
 abstract class _ArticleBean implements Bean<Article> {
+  final articleId = IntField('article_id');
   final id = IntField('id');
   final title = StrField('title');
   final updatedAt = DateTimeField('updated_at');
@@ -18,6 +19,7 @@ abstract class _ArticleBean implements Bean<Article> {
   final body = StrField('body');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
+        articleId.name: articleId,
         id.name: id,
         title.name: title,
         updatedAt.name: updatedAt,
@@ -40,6 +42,7 @@ abstract class _ArticleBean implements Bean<Article> {
       createdAt: adapter.parseValue(map['created_at']),
       body: adapter.parseValue(map['body']),
     );
+    model.articleId = adapter.parseValue(map['article_id']);
 
     return model;
   }
@@ -49,6 +52,9 @@ abstract class _ArticleBean implements Bean<Article> {
     List<SetColumn> ret = [];
 
     if (only == null && !onlyNonNull) {
+      if (model.articleId != null) {
+        ret.add(articleId.set(model.articleId));
+      }
       ret.add(id.set(model.id));
       ret.add(title.set(model.title));
       ret.add(updatedAt.set(model.updatedAt));
@@ -59,6 +65,10 @@ abstract class _ArticleBean implements Bean<Article> {
       ret.add(createdAt.set(model.createdAt));
       ret.add(body.set(model.body));
     } else if (only != null) {
+      if (model.articleId != null) {
+        if (only.contains(articleId.name))
+          ret.add(articleId.set(model.articleId));
+      }
       if (only.contains(id.name)) ret.add(id.set(model.id));
       if (only.contains(title.name)) ret.add(title.set(model.title));
       if (only.contains(updatedAt.name))
@@ -74,6 +84,9 @@ abstract class _ArticleBean implements Bean<Article> {
         ret.add(createdAt.set(model.createdAt));
       if (only.contains(body.name)) ret.add(body.set(model.body));
     } else /* if (onlyNonNull) */ {
+      if (model.articleId != null) {
+        ret.add(articleId.set(model.articleId));
+      }
       if (model.id != null) {
         ret.add(id.set(model.id));
       }
@@ -108,11 +121,13 @@ abstract class _ArticleBean implements Bean<Article> {
 
   Future<void> createTable({bool ifNotExists = false}) async {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
-    st.addInt(id.name, primary: true, isNullable: false);
+    st.addInt(articleId.name,
+        primary: true, autoIncrement: true, isNullable: false);
+    st.addInt(id.name, isNullable: false);
     st.addStr(title.name, isNullable: false);
     st.addDateTime(updatedAt.name, isNullable: false);
     st.addStr(slug.name, isNullable: false);
-    st.addInt(favoriteCount.name, isNullable: false);
+    st.addInt(favoriteCount.name, isNullable: true);
     st.addBool(favorited.name, isNullable: false);
     st.addStr(description.name, isNullable: false);
     st.addDateTime(createdAt.name, isNullable: false);
@@ -125,12 +140,13 @@ abstract class _ArticleBean implements Bean<Article> {
       bool onlyNonNull = false,
       Set<String> only}) async {
     final Insert insert = inserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(articleId.name);
     var retId = await adapter.insert(insert);
     if (cascade) {
       Article newModel;
       if (model.author != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(retId);
         authorBean.associateArticle(model.author, newModel);
         await authorBean.insert(model.author, cascade: cascade);
       }
@@ -165,12 +181,13 @@ abstract class _ArticleBean implements Bean<Article> {
       Set<String> only,
       bool onlyNonNull = false}) async {
     final Upsert upsert = upserter
-        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
+        .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+        .id(articleId.name);
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       Article newModel;
       if (model.author != null) {
-        newModel ??= await find(model.id);
+        newModel ??= await find(retId);
         authorBean.associateArticle(model.author, newModel);
         await authorBean.upsert(model.author, cascade: cascade);
       }
@@ -208,14 +225,14 @@ abstract class _ArticleBean implements Bean<Article> {
       Set<String> only,
       bool onlyNonNull = false}) async {
     final Update update = updater
-        .where(this.id.eq(model.id))
+        .where(this.articleId.eq(model.articleId))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
     final ret = adapter.update(update);
     if (cascade) {
       Article newModel;
       if (model.author != null) {
         if (associate) {
-          newModel ??= await find(model.id);
+          newModel ??= await find(model.articleId);
           authorBean.associateArticle(model.author, newModel);
         }
         await authorBean.update(model.author,
@@ -243,7 +260,7 @@ abstract class _ArticleBean implements Bean<Article> {
         var model = models[i];
         data.add(
             toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
-        where.add(this.id.eq(model.id));
+        where.add(this.articleId.eq(model.articleId));
       }
       final UpdateMany update = updaters.addAll(data, where);
       await adapter.updateMany(update);
@@ -251,9 +268,9 @@ abstract class _ArticleBean implements Bean<Article> {
     }
   }
 
-  Future<Article> find(int id,
+  Future<Article> find(int articleId,
       {bool preload = false, bool cascade = false}) async {
-    final Find find = finder.where(this.id.eq(id));
+    final Find find = finder.where(this.articleId.eq(articleId));
     final Article model = await findOne(find);
     if (preload && model != null) {
       await this.preload(model, cascade: cascade);
@@ -261,14 +278,14 @@ abstract class _ArticleBean implements Bean<Article> {
     return model;
   }
 
-  Future<int> remove(int id, {bool cascade = false}) async {
+  Future<int> remove(int articleId, {bool cascade = false}) async {
     if (cascade) {
-      final Article newModel = await find(id);
+      final Article newModel = await find(articleId);
       if (newModel != null) {
         await authorBean.removeByArticle(newModel.id);
       }
     }
-    final Remove remove = remover.where(this.id.eq(id));
+    final Remove remove = remover.where(this.articleId.eq(articleId));
     return adapter.remove(remove);
   }
 
@@ -277,7 +294,7 @@ abstract class _ArticleBean implements Bean<Article> {
     if (models == null || models.isEmpty) return 0;
     final Remove remove = remover;
     for (final model in models) {
-      remove.or(this.id.eq(model.id));
+      remove.or(this.articleId.eq(model.articleId));
     }
     return adapter.remove(remove);
   }
@@ -294,7 +311,7 @@ abstract class _ArticleBean implements Bean<Article> {
         models,
         (Article model) => [model.id],
         authorBean.findByArticleList,
-        (Author model) => [model.postId],
+        (Author model) => [model.articleId],
         (Article model, Author child) => model.author = child,
         cascade: cascade);
     return models;

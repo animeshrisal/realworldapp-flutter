@@ -8,13 +8,15 @@ part 'article.g.dart';
 
 @JsonSerializable(nullable: false)
 class Article {
-  @PrimaryKey()
+  @PrimaryKey(auto: true)
+  int articleId;
   final int id;
   final String title;
   final DateTime updatedAt;
 
   final String slug;
 
+  @Column(isNullable: true)
   final int favoriteCount;
   final bool favorited;
   final String description;
@@ -39,6 +41,8 @@ class Article {
   factory Article.fromJson(Map<String, dynamic> json) =>
       _$ArticleFromJson(json);
   Map<String, dynamic> toJson() => _$ArticleToJson(this);
+
+  static String get tableName => 'articles';
 }
 
 @GenBean()
@@ -49,5 +53,5 @@ class ArticleBean extends Bean<Article> with _ArticleBean {
 
   final AuthorBean authorBean;
 
-  String get tableName => 'article';
+  final String tableName = 'articles';
 }

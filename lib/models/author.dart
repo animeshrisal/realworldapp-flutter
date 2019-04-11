@@ -8,14 +8,20 @@ part 'author.g.dart';
 @JsonSerializable(nullable: false)
 class Author {
   @PrimaryKey(auto: true)
-  final int id;
-  final String username;
-  final String image;
-  final String bio;
-  @BelongsTo(ArticleBean)
-  int postId;
+  int id;
 
-  Author({this.id, this.username, this.image, this.bio});
+  final String username;
+
+  @Column(isNullable: true)
+  final String image;
+
+  @Column(isNullable: true)
+  final String bio;
+
+  @BelongsTo(ArticleBean)
+  int articleId;
+
+  Author({this.username, this.image, this.bio});
 
   factory Author.fromJson(Map<String, dynamic> json) => _$AuthorFromJson(json);
   Map<String, dynamic> toJson() => _$AuthorToJson(this);
@@ -28,5 +34,5 @@ class AuthorBean extends Bean<Author> with _AuthorBean {
   ArticleBean get articleBean => _articleBean ??= ArticleBean(adapter);
   AuthorBean(Adapter adapter) : super(adapter);
 
-  String get tableName => 'auth_user';
+  String get tableName => 'authors';
 }

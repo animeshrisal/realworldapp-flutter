@@ -17,10 +17,12 @@ Article _$ArticleFromJson(Map<String, dynamic> json) {
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       body: json['body'] as String,
-      author: Author.fromJson(json['author'] as Map<String, dynamic>));
+      author: Author.fromJson(json['author'] as Map<String, dynamic>))
+    ..articleId = json['articleId'] as int;
 }
 
 Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
+      'articleId': instance.articleId,
       'id': instance.id,
       'title': instance.title,
       'updatedAt': instance.updatedAt.toIso8601String(),

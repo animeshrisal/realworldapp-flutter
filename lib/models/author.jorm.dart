@@ -11,23 +11,23 @@ abstract class _AuthorBean implements Bean<Author> {
   final username = StrField('username');
   final image = StrField('image');
   final bio = StrField('bio');
-  final postId = IntField('post_id');
+  final articleId = IntField('article_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         username.name: username,
         image.name: image,
         bio.name: bio,
-        postId.name: postId,
+        articleId.name: articleId,
       };
   Author fromMap(Map map) {
     Author model = Author(
-      id: adapter.parseValue(map['id']),
       username: adapter.parseValue(map['username']),
       image: adapter.parseValue(map['image']),
       bio: adapter.parseValue(map['bio']),
     );
-    model.postId = adapter.parseValue(map['post_id']);
+    model.id = adapter.parseValue(map['id']);
+    model.articleId = adapter.parseValue(map['article_id']);
 
     return model;
   }
@@ -43,7 +43,7 @@ abstract class _AuthorBean implements Bean<Author> {
       ret.add(username.set(model.username));
       ret.add(image.set(model.image));
       ret.add(bio.set(model.bio));
-      ret.add(postId.set(model.postId));
+      ret.add(articleId.set(model.articleId));
     } else if (only != null) {
       if (model.id != null) {
         if (only.contains(id.name)) ret.add(id.set(model.id));
@@ -51,7 +51,8 @@ abstract class _AuthorBean implements Bean<Author> {
       if (only.contains(username.name)) ret.add(username.set(model.username));
       if (only.contains(image.name)) ret.add(image.set(model.image));
       if (only.contains(bio.name)) ret.add(bio.set(model.bio));
-      if (only.contains(postId.name)) ret.add(postId.set(model.postId));
+      if (only.contains(articleId.name))
+        ret.add(articleId.set(model.articleId));
     } else /* if (onlyNonNull) */ {
       if (model.id != null) {
         ret.add(id.set(model.id));
@@ -65,8 +66,8 @@ abstract class _AuthorBean implements Bean<Author> {
       if (model.bio != null) {
         ret.add(bio.set(model.bio));
       }
-      if (model.postId != null) {
-        ret.add(postId.set(model.postId));
+      if (model.articleId != null) {
+        ret.add(articleId.set(model.articleId));
       }
     }
 
@@ -77,9 +78,9 @@ abstract class _AuthorBean implements Bean<Author> {
     final st = Sql.create(tableName, ifNotExists: ifNotExists);
     st.addInt(id.name, primary: true, autoIncrement: true, isNullable: false);
     st.addStr(username.name, isNullable: false);
-    st.addStr(image.name, isNullable: false);
-    st.addStr(bio.name, isNullable: false);
-    st.addInt(postId.name,
+    st.addStr(image.name, isNullable: true);
+    st.addStr(bio.name, isNullable: true);
+    st.addInt(articleId.name,
         foreignTable: articleBean.tableName,
         foreignCol: 'id',
         isNullable: false);
@@ -185,9 +186,9 @@ abstract class _AuthorBean implements Bean<Author> {
     return adapter.remove(remove);
   }
 
-  Future<Author> findByArticle(int postId,
+  Future<Author> findByArticle(int articleId,
       {bool preload = false, bool cascade = false}) async {
-    final Find find = finder.where(this.postId.eq(postId));
+    final Find find = finder.where(this.articleId.eq(articleId));
     return findOne(find);
   }
 
@@ -197,18 +198,18 @@ abstract class _AuthorBean implements Bean<Author> {
     if (models == null || models.isEmpty) return [];
     final Find find = finder;
     for (Article model in models) {
-      find.or(this.postId.eq(model.id));
+      find.or(this.articleId.eq(model.id));
     }
     return findMany(find);
   }
 
-  Future<int> removeByArticle(int postId) async {
-    final Remove rm = remover.where(this.postId.eq(postId));
+  Future<int> removeByArticle(int articleId) async {
+    final Remove rm = remover.where(this.articleId.eq(articleId));
     return await adapter.remove(rm);
   }
 
   void associateArticle(Author child, Article parent) {
-    child.postId = parent.id;
+    child.articleId = parent.id;
   }
 
   ArticleBean get articleBean;
