@@ -37,7 +37,7 @@ class ArticleBloc extends BlocBase {
         ArticleList.fromJson(await network.getResponse(null));
 
     try {
-      articleBean.upsertMany(articleList.articles, cascade: true);
+      articleBean.upsertMany(articleList.articles);
       print("inserted");
     } catch (e) {
       print(e);

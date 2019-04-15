@@ -18,8 +18,8 @@ class Author {
   @Column(isNullable: true)
   final String bio;
 
-  @BelongsTo(ArticleBean)
-  int articleId;
+  @HasMany(ArticleBean)
+  List<Article> articles;
 
   Author({this.username, this.image, this.bio});
 
@@ -29,10 +29,11 @@ class Author {
 
 @GenBean()
 class AuthorBean extends Bean<Author> with _AuthorBean {
-  ArticleBean _articleBean;
+  final ArticleBean articleBean;
 
-  ArticleBean get articleBean => _articleBean ??= ArticleBean(adapter);
-  AuthorBean(Adapter adapter) : super(adapter);
+  AuthorBean(Adapter adapter)
+      : articleBean = ArticleBean(adapter),
+        super(adapter);
 
-  String get tableName => 'authors';
+  final String tableName = 'authors';
 }

@@ -11,14 +11,12 @@ abstract class _AuthorBean implements Bean<Author> {
   final username = StrField('username');
   final image = StrField('image');
   final bio = StrField('bio');
-  final articleId = IntField('article_id');
   Map<String, Field> _fields;
   Map<String, Field> get fields => _fields ??= {
         id.name: id,
         username.name: username,
         image.name: image,
         bio.name: bio,
-        articleId.name: articleId,
       };
   Author fromMap(Map map) {
     Author model = Author(
@@ -27,7 +25,6 @@ abstract class _AuthorBean implements Bean<Author> {
       bio: adapter.parseValue(map['bio']),
     );
     model.id = adapter.parseValue(map['id']);
-    model.articleId = adapter.parseValue(map['article_id']);
 
     return model;
   }
@@ -43,7 +40,6 @@ abstract class _AuthorBean implements Bean<Author> {
       ret.add(username.set(model.username));
       ret.add(image.set(model.image));
       ret.add(bio.set(model.bio));
-      ret.add(articleId.set(model.articleId));
     } else if (only != null) {
       if (model.id != null) {
         if (only.contains(id.name)) ret.add(id.set(model.id));
@@ -51,8 +47,6 @@ abstract class _AuthorBean implements Bean<Author> {
       if (only.contains(username.name)) ret.add(username.set(model.username));
       if (only.contains(image.name)) ret.add(image.set(model.image));
       if (only.contains(bio.name)) ret.add(bio.set(model.bio));
-      if (only.contains(articleId.name))
-        ret.add(articleId.set(model.articleId));
     } else /* if (onlyNonNull) */ {
       if (model.id != null) {
         ret.add(id.set(model.id));
@@ -66,9 +60,6 @@ abstract class _AuthorBean implements Bean<Author> {
       if (model.bio != null) {
         ret.add(bio.set(model.bio));
       }
-      if (model.articleId != null) {
-        ret.add(articleId.set(model.articleId));
-      }
     }
 
     return ret;
@@ -80,10 +71,6 @@ abstract class _AuthorBean implements Bean<Author> {
     st.addStr(username.name, isNullable: false);
     st.addStr(image.name, isNullable: true);
     st.addStr(bio.name, isNullable: true);
-    st.addInt(articleId.name,
-        foreignTable: articleBean.tableName,
-        foreignCol: 'id',
-        isNullable: false);
     return adapter.createTable(st);
   }
 
@@ -97,19 +84,37 @@ abstract class _AuthorBean implements Bean<Author> {
     var retId = await adapter.insert(insert);
     if (cascade) {
       Author newModel;
+      if (model.articles != null) {
+        newModel ??= await find(retId);
+        model.articles.forEach((x) => articleBean.associateAuthor(x, newModel));
+        for (final child in model.articles) {
+          await articleBean.insert(child, cascade: cascade);
+        }
+      }
     }
     return retId;
   }
 
   Future<void> insertMany(List<Author> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
-    final List<List<SetColumn>> data = models
-        .map((model) =>
-            toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
-        .toList();
-    final InsertMany insert = inserters.addAll(data);
-    await adapter.insertMany(insert);
-    return;
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(insert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = models
+          .map((model) =>
+              toSetColumns(model, only: only, onlyNonNull: onlyNonNull))
+          .toList();
+      final InsertMany insert = inserters.addAll(data);
+      await adapter.insertMany(insert);
+      return;
+    }
   }
 
   Future<dynamic> upsert(Author model,
@@ -122,21 +127,39 @@ abstract class _AuthorBean implements Bean<Author> {
     var retId = await adapter.upsert(upsert);
     if (cascade) {
       Author newModel;
+      if (model.articles != null) {
+        newModel ??= await find(retId);
+        model.articles.forEach((x) => articleBean.associateAuthor(x, newModel));
+        for (final child in model.articles) {
+          await articleBean.upsert(child, cascade: cascade);
+        }
+      }
     }
     return retId;
   }
 
   Future<void> upsertMany(List<Author> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
-    final List<List<SetColumn>> data = [];
-    for (var i = 0; i < models.length; ++i) {
-      var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(upsert(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+      }
+      final UpsertMany upsert = upserters.addAll(data);
+      await adapter.upsertMany(upsert);
+      return;
     }
-    final UpsertMany upsert = upserters.addAll(data);
-    await adapter.upsertMany(upsert);
-    return;
   }
 
   Future<int> update(Author model,
@@ -147,31 +170,67 @@ abstract class _AuthorBean implements Bean<Author> {
     final Update update = updater
         .where(this.id.eq(model.id))
         .setMany(toSetColumns(model, only: only, onlyNonNull: onlyNonNull));
-    return adapter.update(update);
+    final ret = adapter.update(update);
+    if (cascade) {
+      Author newModel;
+      if (model.articles != null) {
+        if (associate) {
+          newModel ??= await find(model.id);
+          model.articles
+              .forEach((x) => articleBean.associateAuthor(x, newModel));
+        }
+        for (final child in model.articles) {
+          await articleBean.update(child,
+              cascade: cascade, associate: associate);
+        }
+      }
+    }
+    return ret;
   }
 
   Future<void> updateMany(List<Author> models,
-      {bool onlyNonNull = false, Set<String> only}) async {
-    final List<List<SetColumn>> data = [];
-    final List<Expression> where = [];
-    for (var i = 0; i < models.length; ++i) {
-      var model = models[i];
-      data.add(
-          toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
-      where.add(this.id.eq(model.id));
+      {bool cascade = false,
+      bool onlyNonNull = false,
+      Set<String> only}) async {
+    if (cascade) {
+      final List<Future> futures = [];
+      for (var model in models) {
+        futures.add(update(model, cascade: cascade));
+      }
+      await Future.wait(futures);
+      return;
+    } else {
+      final List<List<SetColumn>> data = [];
+      final List<Expression> where = [];
+      for (var i = 0; i < models.length; ++i) {
+        var model = models[i];
+        data.add(
+            toSetColumns(model, only: only, onlyNonNull: onlyNonNull).toList());
+        where.add(this.id.eq(model.id));
+      }
+      final UpdateMany update = updaters.addAll(data, where);
+      await adapter.updateMany(update);
+      return;
     }
-    final UpdateMany update = updaters.addAll(data, where);
-    await adapter.updateMany(update);
-    return;
   }
 
   Future<Author> find(int id,
       {bool preload = false, bool cascade = false}) async {
     final Find find = finder.where(this.id.eq(id));
-    return await findOne(find);
+    final Author model = await findOne(find);
+    if (preload && model != null) {
+      await this.preload(model, cascade: cascade);
+    }
+    return model;
   }
 
-  Future<int> remove(int id) async {
+  Future<int> remove(int id, {bool cascade = false}) async {
+    if (cascade) {
+      final Author newModel = await find(id);
+      if (newModel != null) {
+        await articleBean.removeByAuthor(newModel.id);
+      }
+    }
     final Remove remove = remover.where(this.id.eq(id));
     return adapter.remove(remove);
   }
@@ -186,30 +245,24 @@ abstract class _AuthorBean implements Bean<Author> {
     return adapter.remove(remove);
   }
 
-  Future<Author> findByArticle(int articleId,
-      {bool preload = false, bool cascade = false}) async {
-    final Find find = finder.where(this.articleId.eq(articleId));
-    return findOne(find);
+  Future<Author> preload(Author model, {bool cascade = false}) async {
+    model.articles = await articleBean.findByAuthor(model.id,
+        preload: cascade, cascade: cascade);
+    return model;
   }
 
-  Future<List<Author>> findByArticleList(List<Article> models,
-      {bool preload = false, bool cascade = false}) async {
-// Return if models is empty. If this is not done, all the records will be returned!
-    if (models == null || models.isEmpty) return [];
-    final Find find = finder;
-    for (Article model in models) {
-      find.or(this.articleId.eq(model.id));
-    }
-    return findMany(find);
-  }
-
-  Future<int> removeByArticle(int articleId) async {
-    final Remove rm = remover.where(this.articleId.eq(articleId));
-    return await adapter.remove(rm);
-  }
-
-  void associateArticle(Author child, Article parent) {
-    child.articleId = parent.id;
+  Future<List<Author>> preloadAll(List<Author> models,
+      {bool cascade = false}) async {
+    models.forEach((Author model) => model.articles ??= []);
+    await OneToXHelper.preloadAll<Author, Article>(
+        models,
+        (Author model) => [model.id],
+        articleBean.findByAuthorList,
+        (Article model) => [model.authorId],
+        (Author model, Article child) =>
+            model.articles = List.from(model.articles)..add(child),
+        cascade: cascade);
+    return models;
   }
 
   ArticleBean get articleBean;

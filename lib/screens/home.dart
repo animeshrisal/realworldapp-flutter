@@ -71,41 +71,47 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        drawer: Drawer(
-            child: BlocEventStateBuilder<AuthenticationState>(
-                bloc: authenticationBloc,
-                builder: (BuildContext context, AuthenticationState state) {
-                  if (state.isAuthenticated) {
-                    return userDrawer();
-                  } else {
-                    return drawer();
-                  }
-                })),
-        appBar: AppBar(
-          title: Text("Home"),
-        ),
-        body: DefaultTabController(
-            length: 3,
-            child: new Scaffold(
-                body: TabBarView(
-                    children: [Articles(), AddArticle(), UsersPage()]),
-                bottomNavigationBar: new TabBar(
-                  tabs: [
-                    Tab(
-                      icon: new Icon(Icons.home),
-                    ),
-                    Tab(
-                      icon: new Icon(Icons.rss_feed),
-                    ),
-                    Tab(
-                      icon: new Icon(Icons.perm_identity),
-                    ),
-                  ],
-                  labelColor: Colors.yellow,
-                  unselectedLabelColor: Colors.blue,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  indicatorPadding: EdgeInsets.all(5.0),
-                  indicatorColor: Colors.red,
-                ))));
+      drawer: Drawer(
+          child: BlocEventStateBuilder<AuthenticationState>(
+              bloc: authenticationBloc,
+              builder: (BuildContext context, AuthenticationState state) {
+                if (state.isAuthenticated) {
+                  return userDrawer();
+                } else {
+                  return drawer();
+                }
+              })),
+      appBar: AppBar(
+        title: Text("Home"),
+      ),
+      body: DefaultTabController(
+          length: 3,
+          child: new Scaffold(
+              body:
+                  TabBarView(children: [Articles(), AddArticle(), UsersPage()]),
+              bottomNavigationBar: new TabBar(
+                tabs: [
+                  Tab(
+                    icon: new Icon(Icons.home),
+                  ),
+                  Tab(
+                    icon: new Icon(Icons.rss_feed),
+                  ),
+                  Tab(
+                    icon: new Icon(Icons.perm_identity),
+                  ),
+                ],
+                labelColor: Colors.yellow,
+                unselectedLabelColor: Colors.blue,
+                indicatorSize: TabBarIndicatorSize.label,
+                indicatorPadding: EdgeInsets.all(5.0),
+                indicatorColor: Colors.red,
+              ))),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.blue,
+        elevation: 1,
+      ),
+    );
   }
 }

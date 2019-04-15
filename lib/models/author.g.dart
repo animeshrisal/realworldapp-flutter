@@ -12,7 +12,9 @@ Author _$AuthorFromJson(Map<String, dynamic> json) {
       image: json['image'] as String,
       bio: json['bio'] as String)
     ..id = json['id'] as int
-    ..articleId = json['articleId'] as int;
+    ..articles = (json['articles'] as List)
+        .map((e) => Article.fromJson(e as Map<String, dynamic>))
+        .toList();
 }
 
 Map<String, dynamic> _$AuthorToJson(Author instance) => <String, dynamic>{
@@ -20,5 +22,5 @@ Map<String, dynamic> _$AuthorToJson(Author instance) => <String, dynamic>{
       'username': instance.username,
       'image': instance.image,
       'bio': instance.bio,
-      'articleId': instance.articleId
+      'articles': instance.articles
     };

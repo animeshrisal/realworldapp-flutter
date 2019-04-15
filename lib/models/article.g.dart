@@ -16,13 +16,11 @@ Article _$ArticleFromJson(Map<String, dynamic> json) {
       favorited: json['favorited'] as bool,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      body: json['body'] as String,
-      author: Author.fromJson(json['author'] as Map<String, dynamic>))
-    ..articleId = json['articleId'] as int;
+      body: json['body'] as String)
+    ..authorId = json['authorId'] as int;
 }
 
 Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
-      'articleId': instance.articleId,
       'id': instance.id,
       'title': instance.title,
       'updatedAt': instance.updatedAt.toIso8601String(),
@@ -32,5 +30,5 @@ Map<String, dynamic> _$ArticleToJson(Article instance) => <String, dynamic>{
       'description': instance.description,
       'createdAt': instance.createdAt.toIso8601String(),
       'body': instance.body,
-      'author': instance.author
+      'authorId': instance.authorId
     };

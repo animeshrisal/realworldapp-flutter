@@ -8,9 +8,9 @@ part 'article.g.dart';
 
 @JsonSerializable(nullable: false)
 class Article {
-  @PrimaryKey(auto: true)
-  int articleId;
-  final int id;
+  @PrimaryKey()
+  int id;
+
   final String title;
   final DateTime updatedAt;
 
@@ -23,8 +23,8 @@ class Article {
   final DateTime createdAt;
   final String body;
 
-  @HasOne(AuthorBean)
-  Author author;
+  @ForeignKey(assoc)
+  int authorId;
 
   Article(
       {this.title,
@@ -35,23 +35,18 @@ class Article {
       this.favorited,
       this.description,
       this.createdAt,
-      this.body,
-      this.author});
-
+      this.body});
   factory Article.fromJson(Map<String, dynamic> json) =>
       _$ArticleFromJson(json);
   Map<String, dynamic> toJson() => _$ArticleToJson(this);
-
-  static String get tableName => 'articles';
 }
 
 @GenBean()
 class ArticleBean extends Bean<Article> with _ArticleBean {
-  ArticleBean(Adapter adapter)
-      : authorBean = AuthorBean(adapter),
-        super(adapter);
+  AuthorBean _authorBean;
 
-  final AuthorBean authorBean;
+  AuthorBean get authorBean => _authorBean ??= AuthorBean(adapter);
+  ArticleBean(Adapter adapter) : super(adapter);
 
   final String tableName = 'articles';
 }
