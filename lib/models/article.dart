@@ -23,7 +23,7 @@ class Article {
   final DateTime createdAt;
   final String body;
 
-  @ForeignKey(assoc)
+  @BelongsTo(AuthorBean)
   int authorId;
 
   Article(

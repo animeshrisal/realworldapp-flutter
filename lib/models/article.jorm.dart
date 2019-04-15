@@ -247,5 +247,9 @@ abstract class _ArticleBean implements Bean<Article> {
     child.authorId = parent.id;
   }
 
+  void associateAuthor2(Author parent, Article child) {
+    parent.id = child.authorId;
+  }
+
   AuthorBean get authorBean;
 }
