@@ -155,6 +155,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  dynamic_theme:
+    dependency: "direct main"
+    description:
+      name: dynamic_theme
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   fixnum:
     dependency: transitive
     description:
@@ -382,6 +389,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.20.0"
+  shared_preferences:
+    dependency: transitive
+    description:
+      name: shared_preferences
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.2"
   shelf:
     dependency: transitive
     description:

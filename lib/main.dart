@@ -6,6 +6,7 @@ import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 import 'package:realworldapp/blocs/authentication/authentication_bloc.dart';
 import 'package:realworldapp/blocs/article/article_bloc.dart';
 import 'package:realworldapp/global/adapter.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 
 void main() async {
   await dbHelper.initialize();
@@ -20,15 +21,20 @@ class MyApp extends StatelessWidget {
         bloc: AuthenticationBloc(),
         child: BlocProvider<ArticleBloc>(
             bloc: ArticleBloc(),
-            child: MaterialApp(
-                title: 'BLoC Samples',
-                theme: ThemeData(
-                    primarySwatch: Colors.blue, brightness: Brightness.dark),
-                home: HomePage(),
-                initialRoute: '/',
-                routes: {
-                  '/register': (context) => RegisterForm(),
-                  '/login': (context) => LoginForm(),
+            child: new DynamicTheme(
+                defaultBrightness: Brightness.light,
+                data: (brightness) => ThemeData(
+                    primarySwatch: Colors.indigo, brightness: brightness),
+                themedWidgetBuilder: (context, theme) {
+                  return MaterialApp(
+                      title: 'BLoC Samples',
+                      theme: theme,
+                      home: HomePage(),
+                      initialRoute: '/',
+                      routes: {
+                        '/register': (context) => RegisterForm(),
+                        '/login': (context) => LoginForm(),
+                      });
                 })));
   }
 }

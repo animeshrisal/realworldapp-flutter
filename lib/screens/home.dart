@@ -9,6 +9,7 @@ import 'package:realworldapp/bloc_helpers/bloc_provider.dart';
 import 'package:realworldapp/blocs/authentication/authentication_event.dart';
 import 'package:realworldapp/bloc_widgets/bloc_state_builder.dart';
 import 'package:realworldapp/blocs/authentication/authentication_state.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -16,7 +17,19 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _value1 = false;
+
+  void _onChanged1(bool value) {
+    DynamicTheme.of(context).setBrightness(
+        Theme.of(context).brightness == Brightness.dark
+            ? Brightness.light
+            : Brightness.dark);
+
+    return setState(() => _value1 = value);
+  }
+
   AuthenticationBloc authenticationBloc;
+  bool _value;
 
   @override
   void initState() {
@@ -43,11 +56,22 @@ class _HomePageState extends State<HomePage> {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (BuildContext context) => LoginForm()));
         },
+      ),
+      Container(
+        padding: new EdgeInsets.all(32.0),
+        child: new Center(
+          child: new Column(
+            children: <Widget>[
+              new Switch(value: _value1, onChanged: _onChanged1),
+            ],
+          ),
+        ),
       )
     ]);
   }
 
   Widget userDrawer() {
+    bool isSwitched = true;
     return ListView(children: <Widget>[
       DrawerHeader(
         child: Text("Profile"),
@@ -64,7 +88,7 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             authenticationBloc.emitEvent(
                 AuthenticationEvent(event: AuthenticationEventType.logout));
-          })
+          }),
     ]);
   }
 
